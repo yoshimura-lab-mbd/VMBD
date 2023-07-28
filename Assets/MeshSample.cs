@@ -5,7 +5,7 @@ using UnityEngine;
 public class MeshSample : MonoBehaviour
 {
     //直方体の数
-        const int slices =1;
+        const int slices =2;
 
     // Start is called before the first frame update
     void Start()
@@ -23,6 +23,11 @@ public class MeshSample : MonoBehaviour
         x[5]= 10.0f;
         x[6]= 10.0f;
         x[7]= 10.0f;
+        x[8]= 20.0f;
+        x[9]= 20.0f;
+        x[10]= 20.0f;
+        x[11]= 20.0f;
+        
 
         y[0]= 0;
         y[1]= 10.0f;
@@ -32,6 +37,11 @@ public class MeshSample : MonoBehaviour
         y[5]= 10.0f;
         y[6]= 0;
         y[7]= 10.0f;
+        y[8]= 0;
+        y[9]= 10.0f;
+        y[10]= 0;
+        y[11]= 10.0f;
+
 
         z[0]= 0;
         z[1]= 0;
@@ -41,6 +51,10 @@ public class MeshSample : MonoBehaviour
         z[5]= 0;
         z[6]= 10.0f;
         z[7]= 10.0f;
+        z[8]= 0;
+        z[9]= 0;
+        z[10]= 10.0f;
+        z[11]= 10.0f;
 
         //頂点の数
         int nVertices = 16 * slices +16 ;
