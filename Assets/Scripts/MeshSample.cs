@@ -23,19 +23,24 @@ public class MeshSample : MonoBehaviour
     float elapseTime;
     int step = 1;
 
-    float[,,] x;
-    float[,,] y;
-    float[,,] z;
+    public float[,,] x;
+    public float[,,] y;
+    public float[,,] z;
     float[] time;
     Vector3[] myVertices;
     Vector3[] myNormals;
-    int[] myTriangles ;
+    int[] myTriangles;
+    public Text text1;
+    public Text text2;
+    public Text text3;
+    
 
     // Start is called before the first frame update
     void Start()
     {
 
     }
+        
 
     // Update is called once per frame
     void Update()
@@ -45,7 +50,7 @@ public class MeshSample : MonoBehaviour
        {
             if(counter_two == false)
             {
-                if(Input.GetKey(KeyCode.Return))
+                if(Input.GetKeyDown(KeyCode.Return))
                 {
                     //Resourceにある指定のパスのCSVファイルを格納
                     _csvFile = Resources.Load("data") as TextAsset; 
@@ -68,7 +73,7 @@ public class MeshSample : MonoBehaviour
                 //断面の横長さ
                 b = 100f*float.Parse(_csvData[0][5]);
                 //時間配列.[i]にはステップ数が入りその時の時間が収納されている
-                float[] time = new float[height-2];
+                time = new float[height-2];
 
                 for(i=0; i<=height-3; i++)
                 {
@@ -105,9 +110,9 @@ public class MeshSample : MonoBehaviour
                 }
 
                 //最終的に求めたい慣性系で観測した頂点の座標([a][b][c]はそれぞれaがステップ数、bがどこの断面か、cが頂点のポイント)
-                float[,,] x = new float [height-2,section,4];
-                float[,,] y = new float [height-2,section,4];
-                float[,,] z = new float [height-2,section,4];
+                x = new float [height-2,section,4];
+                y = new float [height-2,section,4];
+                z = new float [height-2,section,4];
 
                 //ボディー座標系で観測した慣性系からボディー座標系へのベクトル
                 Vector3 vv = new Vector3(0.00f,0.00f,0.00f);
@@ -163,8 +168,6 @@ public class MeshSample : MonoBehaviour
                             z[l,n,3]=100*(vv.z + newv3.z);
                         }
                 }
-
-                Debug.Log(v0);
 
                 //直方体の数
                 slices = section-1 ;
@@ -344,9 +347,9 @@ public class MeshSample : MonoBehaviour
                 MeshFilter meshFilter = GetComponent<MeshFilter>();
 
                 meshFilter.mesh=myMesh;
-
-                counter_one = true;
-                }
+                Debug.Log(y[1000,1,1]);
+                counter_one = !counter_one;
+                }   
             }
         }
 
@@ -355,15 +358,18 @@ public class MeshSample : MonoBehaviour
             //モード選択画面(初期位置のみ配置)
             if(counter_two == false)
             {
+                text1.text ="Push 'Enterkey' to go to animation screen!";
+                text2.text ="Push 'Spacekey' to go to slider screen!";
+                text3.text ="Start position!";
                 //アニメーション画面に移る
-                if(Input.GetKey(KeyCode.Return))
+                if(Input.GetKeyDown(KeyCode.Return))
                 {
                     counter_two = true;
                     //時間を計測中にする
                     counter_three = true;
                 }
 
-                if(Input.GetKey(KeyCode.Space))
+                if(Input.GetKeyDown(KeyCode.Space))
                 {
                     counter_one = false;
                     counter_two = true;
@@ -373,14 +379,88 @@ public class MeshSample : MonoBehaviour
             //アニメーション画面
             if(counter_two == true)
             {
+                text1.text ="Push 'Enterkey' to stop or play animation!";
+                text2.text ="Push 'Spacekey' to go to mode screen!";
                 //アニメーションを停止してモード選択画面に
-                if(Input.GetKey(KeyCode.Space))
+                if(Input.GetKeyDown(KeyCode.Space))
                 {
+                    for(int i=0;i <= slices; ++i)
+                {
+                    //左からi番目の四角形の左下の頂点番号
+                    int pi = i * 16;
+
+                    //左からi番目の手前の四角形の左下の頂点の位置と法線(正面から見るのに使う)
+                    myVertices[pi].Set(x[0,i,0],y[0,i,0],z[0,i,0]);
+
+                    //左からi番目の手前の四角形の左上の頂点の位置と法線(正面から見るのに使う)
+                    myVertices[pi+1].Set(x[0,i,1],y[0,i,1],z[0,i,1]);
+            
+
+                    //左からi番目の奥の四角形の左下の頂点の位置と法線(裏側から見るのに使う)
+                    myVertices[pi+2].Set(x[0,i,2],y[0,i,2],z[0,i,2]);
+           
+
+                    //左からi番目の奥の四角形の左上の頂点の位置と法線(裏側から見るに使う)
+                    myVertices[pi+3].Set(x[0,i,3],y[0,i,3],z[0,i,3]);
+            
+
+                    //左からi番目の手前の四角形の左下の頂点の位置と法線(下から見るのに使う)
+                    myVertices[pi+4].Set(x[0,i,0],y[0,i,0],z[0,i,0]);
+
+
+                    //左からi番目の手前の四角形の左上の頂点の位置と法線(上から見るのに使う)
+                    myVertices[pi+5].Set(x[0,i,1],y[0,i,1],z[0,i,1]);
+            
+
+                    //左からi番目の奥の四角形の左下の頂点の位置と法線(下から見るのに使う)
+                    myVertices[pi+6].Set(x[0,i,2],y[0,i,2],z[0,i,2]);
+            
+
+                    //左からi番目の奥の四角形の左上の頂点の位置と法線(上から見るに使う)
+                    myVertices[pi+7].Set(x[0,i,3],y[0,i,3],z[0,i,3]);  
+
+
+                    //左からi番目の手前の四角形の左下の頂点の位置と法線(左から見るのに使う)
+                    myVertices[pi+8].Set(x[0,i,0],y[0,i,0],z[0,i,0]);
+            
+
+                    //左からi番目の手前の四角形の左上の頂点の位置と法線(左から見るのに使う)
+                   myVertices[pi+9].Set(x[0,i,1],y[0,i,1],z[0,i,1]);
+            
+
+                    //左からi番目の奥の四角形の左下の頂点の位置と法線(左から見るのに使う)
+                    myVertices[pi+10].Set(x[0,i,2],y[0,i,2],z[0,i,2]);
+            
+
+                    //左からi番目の奥の四角形の左上の頂点の位置と法線(左から見るに使う)
+                    myVertices[pi+11].Set(x[0,i,3],y[0,i,3],z[0,i,3]);   
+
+                    //左からi番目の手前の四角形の左下の頂点の位置と法線(右から見るのに使う)
+                    myVertices[pi+12].Set(x[0,i,0],y[0,i,0],z[0,i,0]);
+            
+
+                    //左からi番目の手前の四角形の左上の頂点の位置と法線(右から見るのに使う)
+                    myVertices[pi+13].Set(x[0,i,1],y[0,i,1],z[0,i,1]);
+
+
+                    //左からi番目の奥の四角形の左下の頂点の位置と法線(右から見るのに使う)
+                    myVertices[pi+14].Set(x[0,i,2],y[0,i,2],z[0,i,2]);
+            
+
+                    //左からi番目の奥の四角形の左上の頂点の位置と法線(右から見るに使う)
+                    myVertices[pi+15].Set(x[0,i,3],y[0,i,3],z[0,i,3]);
+
+                }
+                    Mesh myMesh = GetComponent<MeshFilter>().mesh;
+                    myMesh.SetVertices(myVertices);
+                    myMesh.RecalculateNormals();
+                    step = 0;
+                    elapseTime = 0.000000000f;
                     counter_two = false;
                 }
 
                 //アニメーションを再生、一時停止する
-                if(Input.GetKey(KeyCode.Return))
+                if(Input.GetKeyDown(KeyCode.Return))
                 {
                     counter_three = !counter_three;
                 }
@@ -389,90 +469,161 @@ public class MeshSample : MonoBehaviour
                 if(counter_three == true)
                 {
                     elapseTime += Time.deltaTime;
+                    text3.text = elapseTime.ToString();
                 }
 
                 //もし経過時間がtime[i]を越したら頂点位置を更新する
                 if(time[step] <= elapseTime)
                 {
-
-                //頂点の設定
-                Vector3[] Vertices = new Vector3[myVertices.Length];
-
                 for(int i=0;i <= slices; ++i)
                 {
                     //左からi番目の四角形の左下の頂点番号
                     int pi = i * 16;
 
                     //左からi番目の手前の四角形の左下の頂点の位置と法線(正面から見るのに使う)
-                    Vertices[pi].Set(x[step,i,0],y[step,i,0],z[step,i,0]);
-            
+                    myVertices[pi].Set(x[step,i,0],y[step,i,0],z[step,i,0]);
 
                     //左からi番目の手前の四角形の左上の頂点の位置と法線(正面から見るのに使う)
-                    Vertices[pi+1].Set(x[step,i,1],y[step,i,1],z[step,i,1]);
+                    myVertices[pi+1].Set(x[step,i,1],y[step,i,1],z[step,i,1]);
             
 
                     //左からi番目の奥の四角形の左下の頂点の位置と法線(裏側から見るのに使う)
-                    Vertices[pi+2].Set(x[step,i,2],y[step,i,2],z[step,i,2]);
+                    myVertices[pi+2].Set(x[step,i,2],y[step,i,2],z[step,i,2]);
            
 
                     //左からi番目の奥の四角形の左上の頂点の位置と法線(裏側から見るに使う)
-                    Vertices[pi+3].Set(x[step,i,3],y[step,i,3],z[step,i,3]);
+                    myVertices[pi+3].Set(x[step,i,3],y[step,i,3],z[step,i,3]);
             
 
                     //左からi番目の手前の四角形の左下の頂点の位置と法線(下から見るのに使う)
-                    Vertices[pi+4].Set(x[step,i,0],y[step,i,0],z[step,i,0]);
+                    myVertices[pi+4].Set(x[step,i,0],y[step,i,0],z[step,i,0]);
 
 
                     //左からi番目の手前の四角形の左上の頂点の位置と法線(上から見るのに使う)
-                    Vertices[pi+5].Set(x[step,i,1],y[step,i,1],z[step,i,1]);
+                    myVertices[pi+5].Set(x[step,i,1],y[step,i,1],z[step,i,1]);
             
 
                     //左からi番目の奥の四角形の左下の頂点の位置と法線(下から見るのに使う)
-                    Vertices[pi+6].Set(x[step,i,2],y[step,i,2],z[step,i,2]);
+                    myVertices[pi+6].Set(x[step,i,2],y[step,i,2],z[step,i,2]);
             
 
                     //左からi番目の奥の四角形の左上の頂点の位置と法線(上から見るに使う)
-                    Vertices[pi+7].Set(x[step,i,3],y[step,i,3],z[step,i,3]);   
+                    myVertices[pi+7].Set(x[step,i,3],y[step,i,3],z[step,i,3]);   
 
 
                     //左からi番目の手前の四角形の左下の頂点の位置と法線(左から見るのに使う)
-                    Vertices[pi+8].Set(x[step,i,0],y[step,i,0],z[step,i,0]);
+                    myVertices[pi+8].Set(x[step,i,0],y[step,i,0],z[step,i,0]);
             
 
                     //左からi番目の手前の四角形の左上の頂点の位置と法線(左から見るのに使う)
-                    Vertices[pi+9].Set(x[step,i,1],y[step,i,1],z[step,i,1]);
+                   myVertices[pi+9].Set(x[step,i,1],y[step,i,1],z[step,i,1]);
             
 
                     //左からi番目の奥の四角形の左下の頂点の位置と法線(左から見るのに使う)
-                    Vertices[pi+10].Set(x[step,i,2],y[step,i,2],z[step,i,2]);
+                    myVertices[pi+10].Set(x[step,i,2],y[step,i,2],z[step,i,2]);
             
 
                     //左からi番目の奥の四角形の左上の頂点の位置と法線(左から見るに使う)
-                    Vertices[pi+11].Set(x[step,i,3],y[step,i,3],z[step,i,3]);  
+                    myVertices[pi+11].Set(x[step,i,3],y[step,i,3],z[step,i,3]);  
 
                     //左からi番目の手前の四角形の左下の頂点の位置と法線(右から見るのに使う)
-                    Vertices[pi+12].Set(x[step,i,0],y[step,i,0],z[step,i,0]);
+                    myVertices[pi+12].Set(x[step,i,0],y[step,i,0],z[step,i,0]);
             
 
                     //左からi番目の手前の四角形の左上の頂点の位置と法線(右から見るのに使う)
-                    Vertices[pi+13].Set(x[step,i,1],y[step,i,1],z[step,i,1]);
+                    myVertices[pi+13].Set(x[step,i,1],y[step,i,1],z[step,i,1]);
 
 
                     //左からi番目の奥の四角形の左下の頂点の位置と法線(右から見るのに使う)
-                    Vertices[pi+14].Set(x[step,i,2],y[step,i,2],z[step,i,2]);
+                    myVertices[pi+14].Set(x[step,i,2],y[step,i,2],z[step,i,2]);
             
 
                     //左からi番目の奥の四角形の左上の頂点の位置と法線(右から見るに使う)
-                    Vertices[pi+15].Set(x[step,i,3],y[step,i,3],z[step,i,3]); 
+                    myVertices[pi+15].Set(x[step,i,3],y[step,i,3],z[step,i,3]); 
                 }
                     Mesh myMesh = GetComponent<MeshFilter>().mesh;
-                    myMesh.SetVertices(Vertices);
+                    myMesh.SetVertices(myVertices);
+                    myMesh.RecalculateNormals();
                     step = step + 1;
                 }
 
-                if(step == height -2 )
+                //計測時間がデータを超したらアニメーション画面を終えてモード選択画面へ
+                if(step == height -3 )
                 {
+                    for(int i=0;i <= slices; ++i)
+                {
+                    //左からi番目の四角形の左下の頂点番号
+                    int pi = i * 16;
+
+                    //左からi番目の手前の四角形の左下の頂点の位置と法線(正面から見るのに使う)
+                    myVertices[pi].Set(x[0,i,0],y[0,i,0],z[0,i,0]);
+
+                    //左からi番目の手前の四角形の左上の頂点の位置と法線(正面から見るのに使う)
+                    myVertices[pi+1].Set(x[0,i,1],y[0,i,1],z[0,i,1]);
+            
+
+                    //左からi番目の奥の四角形の左下の頂点の位置と法線(裏側から見るのに使う)
+                    myVertices[pi+2].Set(x[0,i,2],y[0,i,2],z[0,i,2]);
+           
+
+                    //左からi番目の奥の四角形の左上の頂点の位置と法線(裏側から見るに使う)
+                    myVertices[pi+3].Set(x[0,i,3],y[0,i,3],z[0,i,3]);
+            
+
+                    //左からi番目の手前の四角形の左下の頂点の位置と法線(下から見るのに使う)
+                    myVertices[pi+4].Set(x[0,i,0],y[0,i,0],z[0,i,0]);
+
+
+                    //左からi番目の手前の四角形の左上の頂点の位置と法線(上から見るのに使う)
+                    myVertices[pi+5].Set(x[0,i,1],y[0,i,1],z[0,i,1]);
+            
+
+                    //左からi番目の奥の四角形の左下の頂点の位置と法線(下から見るのに使う)
+                    myVertices[pi+6].Set(x[0,i,2],y[0,i,2],z[0,i,2]);
+            
+
+                    //左からi番目の奥の四角形の左上の頂点の位置と法線(上から見るに使う)
+                    myVertices[pi+7].Set(x[0,i,3],y[0,i,3],z[0,i,3]);  
+
+
+                    //左からi番目の手前の四角形の左下の頂点の位置と法線(左から見るのに使う)
+                    myVertices[pi+8].Set(x[0,i,0],y[0,i,0],z[0,i,0]);
+            
+
+                    //左からi番目の手前の四角形の左上の頂点の位置と法線(左から見るのに使う)
+                   myVertices[pi+9].Set(x[0,i,1],y[0,i,1],z[0,i,1]);
+            
+
+                    //左からi番目の奥の四角形の左下の頂点の位置と法線(左から見るのに使う)
+                    myVertices[pi+10].Set(x[0,i,2],y[0,i,2],z[0,i,2]);
+            
+
+                    //左からi番目の奥の四角形の左上の頂点の位置と法線(左から見るに使う)
+                    myVertices[pi+11].Set(x[0,i,3],y[0,i,3],z[0,i,3]);   
+
+                    //左からi番目の手前の四角形の左下の頂点の位置と法線(右から見るのに使う)
+                    myVertices[pi+12].Set(x[0,i,0],y[0,i,0],z[0,i,0]);
+            
+
+                    //左からi番目の手前の四角形の左上の頂点の位置と法線(右から見るのに使う)
+                    myVertices[pi+13].Set(x[0,i,1],y[0,i,1],z[0,i,1]);
+
+
+                    //左からi番目の奥の四角形の左下の頂点の位置と法線(右から見るのに使う)
+                    myVertices[pi+14].Set(x[0,i,2],y[0,i,2],z[0,i,2]);
+            
+
+                    //左からi番目の奥の四角形の左上の頂点の位置と法線(右から見るに使う)
+                    myVertices[pi+15].Set(x[0,i,3],y[0,i,3],z[0,i,3]);
+                     
+                }
+                    Mesh myMesh = GetComponent<MeshFilter>().mesh;
+                    myMesh.SetVertices(myVertices);
+                    myMesh.RecalculateNormals();
+                    step = 1;
+                    elapseTime = 0.000000000f;
                     counter_two = false;
+
                 }
             }            
         }
