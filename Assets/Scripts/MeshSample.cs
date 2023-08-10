@@ -38,12 +38,13 @@ public class MeshSample : MonoBehaviour
     public Text text5;
     public Slider slider;
     int vvv;
+    GameObject mainCamObj;
 
 
     // Start is called before the first frame update
     void Start()
     {
-      
+      mainCamObj = Camera.main.gameObject;
     }
         
 
@@ -72,9 +73,9 @@ public class MeshSample : MonoBehaviour
                 //断面数
                 section = int.Parse(_csvData[0][3]);
                 //断面の縦長さ
-                a = 100f*float.Parse(_csvData[0][4]);
+                a = float.Parse(_csvData[0][4]);
                 //断面の横長さ
-                b = 100f*float.Parse(_csvData[0][5]);
+                b = float.Parse(_csvData[0][5]);
                 //時間配列.[i]にはステップ数が入りその時の時間が収納されている
                 time = new float[height-2];
 
@@ -142,11 +143,11 @@ public class MeshSample : MonoBehaviour
                             //ボディー座標系で観測した慣性系からボディー座標系へのベクトルを再計算
                             vv.x=centerx[l,n];
                             vv.y=centery[l,n];
-                            vv.z=centerz[l,n];
+                            vv.z=-centerz[l,n];
                             //ボディー座標系から慣性系へ移すクォータニオンを再計算
-                            q.x=q1[l,n];
+                            q.x=-q1[l,n];
                             q.y=q2[l,n];
-                            q.z=q3[l,n];
+                            q.z=-q3[l,n];
                             q.w=q0[l,n];
                             //慣性系で観測した中心点から角頂点へのベクトルを計算
                             newv0= q * v0;
@@ -154,21 +155,21 @@ public class MeshSample : MonoBehaviour
                             newv2= q * v2;
                             newv3= q * v3;
                             //慣性系で記述した慣性系からボディー座標系へのベクトル(point 0)
-                            x[l,n,0]=100*(vv.x + newv0.x);
-                            y[l,n,0]=100*(vv.y + newv0.y);
-                            z[l,n,0]=100*(vv.z + newv0.z);
+                            x[l,n,0]=(vv.x + newv0.x);
+                            y[l,n,0]=(vv.y + newv0.y);
+                            z[l,n,0]=(vv.z + newv0.z);
                             //慣性系で記述した慣性系からボディー座標系へのベクトル(point 1)
-                            x[l,n,1]=100*(vv.x + newv1.x);
-                            y[l,n,1]=100*(vv.y + newv1.y);
-                            z[l,n,1]=100*(vv.z + newv1.z);
+                            x[l,n,1]=(vv.x + newv1.x);
+                            y[l,n,1]=(vv.y + newv1.y);
+                            z[l,n,1]=(vv.z + newv1.z);
                             //慣性系で記述した慣性系からボディー座標系へのベクトル(point 2)
-                            x[l,n,2]=100*(vv.x + newv2.x);
-                            y[l,n,2]=100*(vv.y + newv2.y);
-                            z[l,n,2]=100*(vv.z + newv2.z);
+                            x[l,n,2]=(vv.x + newv2.x);
+                            y[l,n,2]=(vv.y + newv2.y);
+                            z[l,n,2]=(vv.z + newv2.z);
                             //慣性系で記述した慣性系からボディー座標系へのベクトル(point 3)
-                            x[l,n,3]=100*(vv.x + newv3.x);
-                            y[l,n,3]=100*(vv.y + newv3.y);
-                            z[l,n,3]=100*(vv.z + newv3.z);
+                            x[l,n,3]=(vv.x + newv3.x);
+                            y[l,n,3]=(vv.y + newv3.y);
+                            z[l,n,3]=(vv.z + newv3.z);
                         }
                 }
 
@@ -879,7 +880,6 @@ public class MeshSample : MonoBehaviour
                     myMesh.SetVertices(myVertices);
                     myMesh.RecalculateNormals();
             }
-
 
     }
 
